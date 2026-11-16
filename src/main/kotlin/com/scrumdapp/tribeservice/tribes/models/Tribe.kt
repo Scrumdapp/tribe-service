@@ -18,7 +18,14 @@ class Tribe {
     @Column(nullable = false)
     var ownerId: Long = 0
 
+    @Column(nullable = false)
     var name: String = ""
 
-    var description: String = ""
+    @Column(nullable = true)
+    var description: String? = null
+
+    @Column(nullable = true)
+    var backgroundPreference: String? = null
+
+    var isActive: Boolean = true
 }
