@@ -18,7 +18,7 @@ class SecurityConfiguration(
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .csrf { disable() }
+            .csrf { it.disable() }
             .usePassport(passportFilter)
 
             .authorizeHttpRequests {

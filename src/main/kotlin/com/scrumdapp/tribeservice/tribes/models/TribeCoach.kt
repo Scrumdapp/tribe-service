@@ -11,7 +11,6 @@ import jakarta.persistence.Table
 @Table(name = "tribe_coaches")
 @IdClass(TribeCoachId::class)
 class TribeCoach {
-
     @Id
     @ManyToOne
     @JoinColumn(name = "tribe_id")
