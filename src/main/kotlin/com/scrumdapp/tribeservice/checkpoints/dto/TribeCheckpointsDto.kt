@@ -1,7 +1,7 @@
-package com.scrumdapp.tribeservice.checkpointsessions.dto
+package com.scrumdapp.tribeservice.checkpoints.dto
 
-import com.scrumdapp.tribeservice.checkpointsessions.CheckpointPresence
-import com.scrumdapp.tribeservice.checkpointsessions.SessionStatus
+import com.scrumdapp.tribeservice.checkpoints.CheckpointPresence
+import com.scrumdapp.tribeservice.checkpoints.SessionStatus
 import java.time.LocalTime
 
 data class TribeCheckpointsDto(
