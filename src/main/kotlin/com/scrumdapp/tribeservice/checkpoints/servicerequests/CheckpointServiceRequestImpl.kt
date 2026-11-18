@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpMethod
 import org.springframework.stereotype.Component
 import java.time.LocalDate
-
+import java.time.YearMonth
+import com.scrumdapp.tribeservice.checkpoints.SessionDateDto
 @Component
 class CheckpointServiceRequestImpl(
     @Value($$"${services.checkpointService}") private val checkpointServiceUrl: String,
@@ -29,6 +30,23 @@ class CheckpointServiceRequestImpl(
     ): List<Checkpoint> {
 
         val uri = "$checkpointServiceUrl/groups/$groupId/checkpoints?sessionName=$sessionName&date=$date"
+        return requestClient.performRequest(HttpMethod.GET, uri)
+    }
+    override fun getCheckpointDates(
+        groupId: Long,
+        month: YearMonth?
+    ): SessionDateDto {
+        val uri = "$checkpointServiceUrl/groups/$groupId/sessions/dates" +
+                if (month != null) "?month=$month" else ""
+
+        return requestClient.performRequest(HttpMethod.GET, uri)
+    }
+
+    override fun getCheckpointMonths(
+        groupId: Long
+    ): List<String> {
+        val uri = "$checkpointServiceUrl/groups/$groupId/sessions/months"
+
         return requestClient.performRequest(HttpMethod.GET, uri)
     }
 

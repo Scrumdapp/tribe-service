@@ -59,7 +59,7 @@ class TribeService(
         return patchedTribe.toResponse(tribeGroups)
     }
 
-    private fun getTribeGroups(tribeId: Long): List<TribeGroupResponse> {
+    fun getTribeGroups(tribeId: Long): List<TribeGroupResponse> {
         val tribeGroups = tribeGroupRepository.findByTribeId(tribeId)
         val userGroups = groupServiceRequests.getGroups()
 

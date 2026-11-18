@@ -3,6 +3,7 @@ package com.scrumdapp.tribeservice.checkpoints.dto
 import com.scrumdapp.tribeservice.checkpoints.CheckpointPresence
 import com.scrumdapp.tribeservice.checkpoints.SessionStatus
 import java.time.LocalTime
+import java.time.LocalDate
 
 data class TribeCheckpointsDto(
     val sessionName: String,
@@ -25,4 +26,10 @@ data class TribeCheckpointSession(
 data class TribeCheckpointPresence(
     val presence: CheckpointPresence,
     val name: String,
+)
+
+data class TribeRecentCheckpointDates(
+    val fromDate: LocalDate?,
+    val toDate: LocalDate?,
+    val dates: List<LocalDate>
 )
