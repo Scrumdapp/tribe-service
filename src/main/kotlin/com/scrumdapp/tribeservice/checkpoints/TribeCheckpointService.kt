@@ -5,9 +5,11 @@ import com.scrumdapp.tribeservice.checkpoints.servicerequests.CheckpointServiceR
 import com.scrumdapp.tribeservice.groups.GroupServiceRequests
 import com.scrumdapp.tribeservice.tribes.TribeService
 import org.springframework.stereotype.Service
+import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalTime
+import java.time.ZoneId
 import java.time.YearMonth
+import java.time.temporal.ChronoUnit
 
 @Service
 class TribeCheckpointService(
@@ -82,13 +84,11 @@ class TribeCheckpointService(
                         stars.average()
                     }
 
-                    val startTime = LocalTime.parse(session.startTime)
-
-                    val endTime = date.atTime(startTime)
-                        .plusMinutes(session.duration)
+                    val endTime = session.startTime
+                        .plus(session.duration, ChronoUnit.MINUTES)
 
                     val status = if (
-                        java.time.LocalDateTime.now().isBefore(endTime)
+                        Instant.now().isBefore(endTime)
                     ) {
                         SessionStatus.OPEN
                     } else {
@@ -100,7 +100,9 @@ class TribeCheckpointService(
                         status = status,
                         session = TribeCheckpointSession(
                             sessionId = session.id,
-                            startedTime = startTime,
+                            startedTime = session.startTime
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalTime(),
                             presences = presences,
                             averageStats = averageStars
                         )

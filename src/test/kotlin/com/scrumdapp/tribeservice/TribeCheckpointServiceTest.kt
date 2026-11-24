@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.ZoneId
 import java.time.YearMonth
 
 class TribeCheckpointServiceTest {
@@ -54,7 +56,9 @@ class TribeCheckpointServiceTest {
 
         val session = CheckpointSession(
             id = 100L,
-            startTime = "09:00",
+            startTime = date.atTime(9, 0)
+                .atZone(ZoneId.systemDefault())
+                .toInstant(),
             duration = 30L,
             groupId = groupId,
             ownerId = 1L,
@@ -83,6 +87,10 @@ class TribeCheckpointServiceTest {
             SessionStatus.CLOSED,
             result.first().groupSessions.first().status
         )
+        assertEquals(
+            LocalTime.of(9, 0),
+            result.first().groupSessions.first().session!!.startedTime
+        )
     }
 
     @Test
@@ -91,7 +99,9 @@ class TribeCheckpointServiceTest {
 
         val session = CheckpointSession(
             id = 100L,
-            startTime = "09:00",
+            startTime = date.atTime(9, 0)
+                .atZone(ZoneId.systemDefault())
+                .toInstant(),
             duration = 30L,
             groupId = groupId,
             ownerId = 1L,
