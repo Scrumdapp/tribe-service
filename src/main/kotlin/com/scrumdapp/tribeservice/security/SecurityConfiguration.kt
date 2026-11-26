@@ -25,7 +25,9 @@ class SecurityConfiguration(
                 it.requestMatchers("/tribes").hasAuthority("COACH")
                 it.requestMatchers("/tribes/{tribeId}").hasAuthority("COACH")
                 it.requestMatchers("/tribes/{tribeId}/users").hasAuthority("COACH")
+                it.requestMatchers("/tribes/{tribeId}/groups/*").hasAuthority("COACH")
                 it.requestMatchers("/tribes/{tribeId}/sessions/*").hasAuthority("COACH")
+                it.anyRequest().denyAll()
             }
 
         return http.build()

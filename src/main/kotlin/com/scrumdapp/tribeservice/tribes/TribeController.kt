@@ -4,6 +4,7 @@ import com.scrumdapp.passportplugin.annotations.passportController.Passport
 import com.scrumdapp.passportplugin.jwt.PassportContent
 import com.scrumdapp.tribeservice.security.HasTribeAccess
 import com.scrumdapp.tribeservice.tribes.dto.TribeCreateDto
+import com.scrumdapp.tribeservice.tribes.dto.TribeGroupImportDto
 import com.scrumdapp.tribeservice.tribes.dto.TribeGroupUserResponse
 import com.scrumdapp.tribeservice.tribes.dto.TribeOverviewResponse
 import com.scrumdapp.tribeservice.tribes.dto.TribePatchDto
@@ -53,6 +54,15 @@ class TribeController(
         @Valid @RequestBody dto: TribePatchDto
     ): TribeResponseDto {
         return tribeService.updateTribe(tribeId, dto)
+    }
+
+    @PostMapping("/{tribeId}/groups/import") // Not final endpoint yet
+    @HasTribeAccess
+    fun importGroups(
+        @PathVariable tribeId: Long,
+        @RequestBody dto: TribeGroupImportDto
+    ) {
+        tribeService.addGroupsToTribe(tribeId, dto.groupIds)
     }
 
     @GetMapping("/{tribeId}/users")

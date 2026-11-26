@@ -5,12 +5,12 @@ data class TribeResponseDto(
     val name: String,
     val backgroundPreference: String?,
     val groupCount: Int,
-    val groups: List<TribeGroup>,
+    val groups: List<TribeResponseGroup>,
     val ownerId: Long,
     val isActive: Boolean,
 )
 
-data class TribeGroup(
+data class TribeResponseGroup(
     val id: Long,
     val name: String,
     val userCount: Int,

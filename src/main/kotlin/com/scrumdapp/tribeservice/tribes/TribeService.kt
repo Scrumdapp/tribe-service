@@ -1,15 +1,17 @@
 package com.scrumdapp.tribeservice.tribes
 
+import com.scrumdapp.passportplugin.jwt.PassportContent
 import com.scrumdapp.tribeservice.groups.GroupServiceRequests
 import com.scrumdapp.tribeservice.tribes.dto.TribeCreateDto
 import com.scrumdapp.tribeservice.tribes.dto.TribeOverviewResponse
 import com.scrumdapp.tribeservice.tribes.dto.TribePatchDto
 import com.scrumdapp.tribeservice.tribes.dto.TribeResponseDto
-import com.scrumdapp.tribeservice.tribes.dto.TribeGroup
+import com.scrumdapp.tribeservice.tribes.dto.TribeResponseGroup
 import com.scrumdapp.tribeservice.tribes.dto.TribeGroupUser
 import com.scrumdapp.tribeservice.tribes.dto.TribeGroupUserResponse
 import com.scrumdapp.tribeservice.tribes.models.Tribe
 import com.scrumdapp.tribeservice.tribes.models.TribeCoach
+import com.scrumdapp.tribeservice.tribes.models.TribeGroup
 import org.springframework.stereotype.Service
 
 @Service
@@ -61,11 +63,38 @@ class TribeService(
         return patchedTribe.toResponse(tribeGroups)
     }
 
+    fun addGroupsToTribe(tribeId: Long, groupIds: List<Long>) {
+        if (groupIds.isEmpty()) return
+
+        val userGroups = PassportContent.fromStaticSecurityContext().userGroups
+        val tribe = tribeRepository.getTribeById(tribeId) ?: throw RuntimeException("Not found")
+        val tribeGroups = tribeGroupRepository.findByTribeId(tribeId)
+
+        val newTribeGroups = mutableListOf<TribeGroup>()
+        for (id in groupIds) {
+
+            if (!userGroups.contains(id)) {
+                throw RuntimeException("One or more groups could not be added")
+            }
+
+            if (!tribeGroups.any { it.groupId == id }) {
+                newTribeGroups.add(TribeGroup().apply {
+                    this.groupId = id
+                    this.tribe = tribe
+                })
+            } else {
+                throw RuntimeException("One or more groups could not be added")
+            }
+        }
+        tribeGroupRepository.saveAll(newTribeGroups)
+    }
+
     fun getTribeUsers(tribeId: Long): List<TribeGroupUserResponse> {
         val groupIds = tribeGroupRepository.findByTribeId(tribeId).map { it.groupId }
 
         val tribeGroupUsers = mutableListOf<TribeGroupUserResponse>()
 
+        // if there are no more than a few 100 hundred groups in a tribe it will be fine
         for (id in groupIds) {
             val groupUsers = groupServiceRequests.getGroupUsers(id)
                 .map { TribeGroupUser(it.userId, it.firstName, it.lastName) }
@@ -76,14 +105,14 @@ class TribeService(
         return tribeGroupUsers
     }
 
-    private fun getTribeGroups(tribeId: Long): List<TribeGroup> {
+    private fun getTribeGroups(tribeId: Long): List<TribeResponseGroup> {
         val tribeGroups = tribeGroupRepository.findByTribeId(tribeId)
         val userGroups = groupServiceRequests.getGroups()
 
-        val groups = mutableListOf<TribeGroup>()
+        val groups = mutableListOf<TribeResponseGroup>()
         for (tribeGroup in tribeGroups) {
             val group = userGroups.find { it.id == tribeGroup.groupId } ?: continue
-            val item = TribeGroup(
+            val item = TribeResponseGroup(
                 tribeGroup.groupId,
                 group.name,
                 group.memberCount
