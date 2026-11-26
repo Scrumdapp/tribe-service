@@ -4,7 +4,8 @@ import com.scrumdapp.passportplugin.annotations.passportController.Passport
 import com.scrumdapp.passportplugin.jwt.PassportContent
 import com.scrumdapp.tribeservice.security.HasTribeAccess
 import com.scrumdapp.tribeservice.tribes.dto.TribeCreateDto
-import com.scrumdapp.tribeservice.tribes.dto.TribeOverviewResponseDto
+import com.scrumdapp.tribeservice.tribes.dto.TribeGroupUserResponse
+import com.scrumdapp.tribeservice.tribes.dto.TribeOverviewResponse
 import com.scrumdapp.tribeservice.tribes.dto.TribePatchDto
 import com.scrumdapp.tribeservice.tribes.dto.TribeResponseDto
 import jakarta.validation.Valid
@@ -25,7 +26,7 @@ class TribeController(
     @GetMapping
     fun getTribes(
         @Passport passport: PassportContent
-    ): List<TribeOverviewResponseDto> {
+    ): List<TribeOverviewResponse> {
         return tribeService.getTribes(passport.userId)
     }
 
@@ -52,6 +53,14 @@ class TribeController(
         @Valid @RequestBody dto: TribePatchDto
     ): TribeResponseDto {
         return tribeService.updateTribe(tribeId, dto)
+    }
+
+    @GetMapping("/{tribeId}/users")
+    @HasTribeAccess
+    fun getTribeUsers(
+        @PathVariable tribeId: Long,
+    ): List<TribeGroupUserResponse> {
+        return tribeService.getTribeUsers(tribeId)
     }
 }
 

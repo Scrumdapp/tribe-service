@@ -1,6 +1,6 @@
 package com.scrumdapp.tribeservice.tribes.dto
 
-data class TribeOverviewResponseDto(
+data class TribeOverviewResponse(
     val id: Long,
     val name: String,
     val backgroundPreference: String?,

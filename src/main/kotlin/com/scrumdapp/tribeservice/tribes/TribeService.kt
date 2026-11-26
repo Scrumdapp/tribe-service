@@ -2,10 +2,12 @@ package com.scrumdapp.tribeservice.tribes
 
 import com.scrumdapp.tribeservice.groups.GroupServiceRequests
 import com.scrumdapp.tribeservice.tribes.dto.TribeCreateDto
-import com.scrumdapp.tribeservice.tribes.dto.TribeOverviewResponseDto
+import com.scrumdapp.tribeservice.tribes.dto.TribeOverviewResponse
 import com.scrumdapp.tribeservice.tribes.dto.TribePatchDto
 import com.scrumdapp.tribeservice.tribes.dto.TribeResponseDto
-import com.scrumdapp.tribeservice.tribes.dto.TribeGroupResponse
+import com.scrumdapp.tribeservice.tribes.dto.TribeGroup
+import com.scrumdapp.tribeservice.tribes.dto.TribeGroupUser
+import com.scrumdapp.tribeservice.tribes.dto.TribeGroupUserResponse
 import com.scrumdapp.tribeservice.tribes.models.Tribe
 import com.scrumdapp.tribeservice.tribes.models.TribeCoach
 import org.springframework.stereotype.Service
@@ -18,7 +20,7 @@ class TribeService(
     private val tribeCoachRepository: TribeCoachRepository
 ) {
 
-    fun getTribes(userId: Long): List<TribeOverviewResponseDto> {
+    fun getTribes(userId: Long): List<TribeOverviewResponse> {
         val tribeGroups = tribeGroupRepository.findByUserId(userId)
 
         return tribeGroups
@@ -59,14 +61,29 @@ class TribeService(
         return patchedTribe.toResponse(tribeGroups)
     }
 
-    private fun getTribeGroups(tribeId: Long): List<TribeGroupResponse> {
+    fun getTribeUsers(tribeId: Long): List<TribeGroupUserResponse> {
+        val groupIds = tribeGroupRepository.findByTribeId(tribeId).map { it.groupId }
+
+        val tribeGroupUsers = mutableListOf<TribeGroupUserResponse>()
+
+        for (id in groupIds) {
+            val groupUsers = groupServiceRequests.getGroupUsers(id)
+                .map { TribeGroupUser(it.userId, it.firstName, it.lastName) }
+
+            tribeGroupUsers.add(TribeGroupUserResponse(id, groupUsers))
+        }
+
+        return tribeGroupUsers
+    }
+
+    private fun getTribeGroups(tribeId: Long): List<TribeGroup> {
         val tribeGroups = tribeGroupRepository.findByTribeId(tribeId)
         val userGroups = groupServiceRequests.getGroups()
 
-        val groups = mutableListOf<TribeGroupResponse>()
+        val groups = mutableListOf<TribeGroup>()
         for (tribeGroup in tribeGroups) {
             val group = userGroups.find { it.id == tribeGroup.groupId } ?: continue
-            val item = TribeGroupResponse(
+            val item = TribeGroup(
                 tribeGroup.groupId,
                 group.name,
                 group.memberCount

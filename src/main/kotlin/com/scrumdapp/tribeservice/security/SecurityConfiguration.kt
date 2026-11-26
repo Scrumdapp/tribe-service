@@ -24,6 +24,7 @@ class SecurityConfiguration(
             .authorizeHttpRequests {
                 it.requestMatchers("/tribes").hasAuthority("COACH")
                 it.requestMatchers("/tribes/{tribeId}").hasAuthority("COACH")
+                it.requestMatchers("/tribes/{tribeId}/users").hasAuthority("COACH")
                 it.requestMatchers("/tribes/{tribeId}/sessions/*").hasAuthority("COACH")
             }
 
